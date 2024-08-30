@@ -5,3 +5,4 @@ checkpoints/activitynet/base
 checkpoints/activitynet/old_vocab
 checkpoints/charades/base
 *.hdf5
+*.ipynb
