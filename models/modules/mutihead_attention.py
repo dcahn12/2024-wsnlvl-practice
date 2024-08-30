@@ -181,10 +181,12 @@ class MultiheadAttention(nn.Module):
                 ).type_as(attn_weights)  # FP16 support: cast to float and back
             attn_weights = attn_weights.view(bsz * self.num_heads, tgt_len, src_len)
 
-        from fairseq import utils
-        attn_weights = utils.softmax(
-            attn_weights, dim=-1, onnx_trace=self.onnx_trace,
-        ).type_as(attn_weights)
+        # from fairseq import utils
+        if self.onnx_trace:
+            attn_weights = F.softmax(attn_weights.float(), dim=-1).type_as(attn_weights)
+        else:
+            attn_weights = F.softmax(attn_weights, dim=-1, dtype=torch.float32).type_as(attn_weights)
+        # attn_weights = utils.softmax(attn_weights, dim=-1, onnx_trace=self.onnx_trace,).type_as(attn_weights)
 
         if gauss_weight is not None:
             # gauss_weight = gauss_weight.unsqueeze(1).repeat(self.num_heads, tgt_len, 1)
